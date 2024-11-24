@@ -1,6 +1,5 @@
 firebase-admin
-firestore
-service_account
 streamlit
-json
+altair
 pandas
+numpy
