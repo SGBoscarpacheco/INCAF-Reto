@@ -1,18 +1,17 @@
 import streamlit as st
 import pandas as pd
 import firebase_admin
-from google.cloud import firestore
+from firebase_admin import credentials, firestore
 from google.oauth2 import service_account
 import json
 
 # --- Configuración de Firebase ---
 if not firebase_admin._apps:  # Verifica si Firebase ya está inicializado
-    key_dict = json.loads(st.secrets["textkey"])
+    key_dict = st.secrets["textkey"]
     creds = service_account.Credentials.from_service_account_info(key_dict)
-    firebase_admin.initialize_app(creds)
-    
+    firebase_admin.initialize_app(credentials.Certificate(key_dict))
 
-db = firestore.Client(credentials=creds, project="incaf-reto")
+db = firestore.Client()
 
 # --- Función para cargar datos desde Firestore ---
 @st.cache_data  # Cache para mejorar rendimiento
