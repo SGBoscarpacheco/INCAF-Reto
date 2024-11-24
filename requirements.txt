@@ -2,4 +2,5 @@ firebase-admin
 streamlit
 altair
 pandas
-numpy
+google-auth
+google-cloud-firestore
