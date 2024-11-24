@@ -11,9 +11,9 @@ if not firebase_admin._apps:  # Verifica si Firebase ya está inicializado
     #cred = credentials.Certificate("incaf-reto-firebase-adminsdk-1ax5o-db4938a50f.json")  # Asegúrate de tener este archivo
     #firebase_admin.initialize_app(cred)
     creds = service_account.Credentials.from_service_account_info(key_dict)
-    db = firestore.Client(credentials=creds, project="incaf-reto")
+    
 
-db = firestore.client()
+db = firestore.Client(credentials=creds, project="incaf-reto")
 
 # --- Función para cargar datos desde Firestore ---
 @st.cache_data  # Cache para mejorar rendimiento
