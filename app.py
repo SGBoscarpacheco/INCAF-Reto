@@ -10,7 +10,7 @@ if not firebase_admin._apps:  # Verifica si Firebase ya está inicializado
     key_dict = json.loads(st.secrets["textkey"])
     creds = service_account.Credentials.from_service_account_info(key_dict)
     
-db = firestore.Client(credentials=creds, project="incaf-reto")
+db = firestore.Client()
 
 # --- Función para cargar datos desde Firestore ---
 @st.cache_data  # Cache para mejorar rendimiento
@@ -47,17 +47,37 @@ if st.sidebar.button("Filtrar por director"):
     st.write(f"Total de Películas: {len(filtered)}")
     st.dataframe(filtered)
 
-# --- Formulario para agregar un nueva Película ---
+# --- Formulario para agregar una nueva Película ---
 st.sidebar.header("Agregar una nueva Película")
 with st.sidebar.form("form"):
     new_title = st.text_input("Título:")
-    new_director = st.text_input("Director:")
-    new_genre = st.text_input("Género:")
-    new_company = st.text_input("Compañia:")
+
+    # Obtener listas únicas para selectbox
+    directors = df['director'].dropna().unique().tolist()
+    companies = df['company'].dropna().unique().tolist()
+    genres = df['genre'].dropna().unique().tolist()
+
+    # Selectbox para director, compañía y género
+    selected_director = st.selectbox("Director:", ["Seleccionar existente..."] + directors)
+    new_director = st.text_input("Nuevo Director:") if selected_director == "Seleccionar existente..." else selected_director
+
+    selected_company = st.selectbox("Compañía:", ["Seleccionar existente..."] + companies)
+    new_company = st.text_input("Nueva Compañía:") if selected_company == "Seleccionar existente..." else selected_company
+
+    selected_genre = st.selectbox("Género:", ["Seleccionar existente..."] + genres)
+    new_genre = st.text_input("Nuevo Género:") if selected_genre == "Seleccionar existente..." else selected_genre
+
+    # Botón para agregar película
     submitted = st.form_submit_button("Agregar Película")
     if submitted:
-        if new_title and new_director:
-            db.collection('movies').add({'name': new_title, 'director': new_director, 'genre': new_genre, 'company': new_company})
+        if new_title and new_director and new_company and new_genre:
+            # Agregar película a Firestore
+            db.collection('movies').add({
+                'name': new_title,
+                'director': new_director,
+                'company': new_company,
+                'genre': new_genre
+            })
             st.sidebar.success(f"Película '{new_title}' agregada con éxito.")
             st.cache_data.clear()  # Limpiar caché para forzar recarga
             st.rerun()  # Recargar la app para mostrar nuevos datos
